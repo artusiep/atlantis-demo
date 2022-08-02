@@ -17,6 +17,7 @@ terraform {
 }
 
 
+
 locals {
   region          = "europe-west3"
   project         = "artusiep-worker-1"
@@ -32,6 +33,14 @@ resource "google_project" "artusiep_worker_1" {
   name            = local.project
   project_id      = local.project
   billing_account = local.billing_account
+}
+
+resource "google_project_service" "service" {
+  for_each = toset([
+    "cloudresourcemanager.googleapis.com"
+  ])
+  project = google_project.artusiep_worker_1
+  service = each.key
 }
 
 
