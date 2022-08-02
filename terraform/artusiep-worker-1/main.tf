@@ -39,7 +39,7 @@ resource "google_project_service" "service" {
   for_each = toset([
     "cloudresourcemanager.googleapis.com"
   ])
-  project = google_project.artusiep_worker_1
+  project = google_project.artusiep_worker_1.id
   service = each.key
 }
 
