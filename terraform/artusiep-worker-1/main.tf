@@ -16,14 +16,11 @@ terraform {
   }
 }
 
-data "google_billing_account" "acct" {
-  display_name = "Moje konto rozliczeniowe"
-  open         = true
-}
 
 locals {
   region          = "europe-west3"
   project         = "artusiep-worker-1"
+  billing_account = "015ED4-E4FEC0-B83F49"
 }
 
 provider "google" {
@@ -34,7 +31,7 @@ provider "google" {
 resource "google_project" "artusiep_worker_1" {
   name            = local.project
   project_id      = local.project
-  billing_account = data.google_billing_account.acct.id
+  billing_account = local.billing_account
 }
 
 
