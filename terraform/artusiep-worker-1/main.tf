@@ -35,15 +35,6 @@ resource "google_project" "artusiep_worker_1" {
   billing_account = local.billing_account
 }
 
-resource "google_project_service" "service" {
-  for_each = toset([
-    "cloudresourcemanager.googleapis.com"
-  ])
-  project = google_project.artusiep_worker_1.id
-  service = each.key
-}
-
-
 #resource "google_storage_bucket" "example_bucket" {
 #  name     = "artusiep-example-bucket"
 #  location = "EU"
