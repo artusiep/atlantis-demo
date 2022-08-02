@@ -20,10 +20,14 @@ terraform {
   }
 }
 
+data "google_billing_account" "acct" {
+  display_name = "Moje konto rozliczeniowe"
+  open         = true
+}
+
 locals {
   region          = "europe-west3"
   project         = "artusiep-atlantis-demo"
-  billing_account = "015ED4-E4FEC0-B83F49"
 }
 
 provider "google" {
@@ -34,7 +38,7 @@ provider "google" {
 resource "google_project" "demo" {
   name            = local.project
   project_id      = local.project
-  billing_account = local.billing_account
+  billing_account = data.google_billing_account.acct.id
 }
 
 resource "google_project_service" "service" {
@@ -103,11 +107,21 @@ resource "google_service_account" "atlantis_service_account" {
 resource "google_project_iam_member" "project" {
   for_each = toset([
     local.project,
-    "artusiep-worker-1"
+    "artusiep-secure",
+    "artusiep-worker-1",
   ])
   project = each.key
   role    = "roles/owner"
   member  = "serviceAccount:${google_service_account.atlantis_service_account.email}"
+}
+
+resource "google_service_account_iam_binding" "workload_identity_user" {
+  service_account_id = google_service_account.atlantis_service_account.name
+  role               = "roles/iam.workloadIdentityUser"
+
+  members = [
+    "serviceAccount:artusiep-atlantis-demo.svc.id.goog[default/atlantis]",
+  ]
 }
 
 module "atlantis" {

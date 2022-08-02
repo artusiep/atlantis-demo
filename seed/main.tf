@@ -9,11 +9,14 @@ terraform {
   }
 }
 
+data "google_billing_account" "acct" {
+  display_name = "Moje konto rozliczeniowe"
+  open         = true
+}
 
 locals {
   region          = "europe-west3"
   project         = "artusiep-secure"
-  billing_account = "015ED4-E4FEC0-B83F49"
 }
 
 provider "google" {
@@ -24,7 +27,7 @@ provider "google" {
 resource "google_project" "artusiep_secure" {
   name            = local.project
   project_id      = local.project
-  billing_account = local.billing_account
+  billing_account = data.google_billing_account.acct.id
 
   lifecycle {
     prevent_destroy = true
