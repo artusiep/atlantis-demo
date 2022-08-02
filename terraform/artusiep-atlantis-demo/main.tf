@@ -103,11 +103,21 @@ resource "google_service_account" "atlantis_service_account" {
 resource "google_project_iam_member" "project" {
   for_each = toset([
     local.project,
-    "artusiep-worker-1"
+    "artusiep-secure",
+    "artusiep-worker-1",
   ])
   project = each.key
   role    = "roles/owner"
   member  = "serviceAccount:${google_service_account.atlantis_service_account.email}"
+}
+
+resource "google_service_account_iam_binding" "workload_identiy_user" {
+  service_account_id = google_service_account.atlantis_service_account.name
+  role               = "roles/iam.workloadIdentityUser"
+
+  members = [
+    "serviceAccount:artusiep-atlantis-demo.svc.id.goog[default/atlantis]",
+  ]
 }
 
 module "atlantis" {
